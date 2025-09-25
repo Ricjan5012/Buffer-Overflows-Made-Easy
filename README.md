@@ -50,52 +50,49 @@ This lab follows **The Cyber Mentor** series (Parts 1–8) to exploit `vulnserve
 
 # Step-by-Step Procedure
 
-## Step 0 — Network & VM Prep
+## Step 1 — Network & VM Prep
 - Start both VMs and ensure they share the same network.  
 - Record IPs:
   - Kali IP: `TODO_kali_ip`  
   - Win10 IP: `TODO_win10_ip`  
-- Take a VM snapshot.
+![image alt](https://github.com/Ricjan5012/Buffer-Overflows-Made-Easy/blob/6b83e2cb582fd0917bdb3d867fe45d4ca43d96a9/step1.png)
 
-## Step 1 — Start vulnserver on Win10
+## Step 1 — Start vulnserver on Win10 & TRUN Overflow (Parts 1 & 2)
 - Run `vulnserver.exe` as Administrator on the Win10 VM.  
-- Confirm service is listening (commonly port `9999` in examples).  
-- Screenshot: vulnserver running with Win10 VM name visible.
-
-## Step 2 — TRUN Overflow (Parts 1 & 2)
+- Confirm service is listening
 - From Kali, send a long string of `A`s to `TRUN` (e.g., `"A"*4000`).  
 - Observe in Immunity that EBP and EIP are overwritten with `0x41414141`.  
 - Save script: `exploit_trun_step2.py`  
-- Screenshot filename: `artifact01_trun_41414141.png`
+
+![image alt](https://github.com/Ricjan5012/Buffer-Overflows-Made-Easy/blob/6b83e2cb582fd0917bdb3d867fe45d4ca43d96a9/step2.png)
+
 
 ## Step 3 — Fuzzing (Part 3)
 - Run a fuzzing script that increases payload size until a crash occurs.  
 - Save fuzz log (e.g., `fuzz_log.txt`) and screenshot Kali showing crash length.  
-- Screenshot filenames: `artifact02_fuzz_kali.png`, `artifact02_fuzz_win10.png`
+![image alt](https://github.com/Ricjan5012/Buffer-Overflows-Made-Easy/blob/6b83e2cb582fd0917bdb3d867fe45d4ca43d96a9/step3.png)
+![image alt](https://github.com/Ricjan5012/Buffer-Overflows-Made-Easy/blob/6b83e2cb582fd0917bdb3d867fe45d4ca43d96a9/step3p2.png)
 
 ## Step 4 — Finding the Offset (Part 4)
 - Generate a cyclic pattern larger than crash size, send it, and note value in EIP.  
 - Use pattern tools (mona / pattern_offset) to compute offset.  
-- Screenshot: `artifact03_offset_eip_value.png`  
-- Record: `TODO_offset`
+![image alt](https://github.com/Ricjan5012/Buffer-Overflows-Made-Easy/blob/6b83e2cb582fd0917bdb3d867fe45d4ca43d96a9/step4.png)  
 
 ## Step 5 — Overwriting EIP (Part 5)
 - Build payload: `<padding = offset>` + `BBBB` (`0x42424242`) + `<filler>` and send.  
 - Verify EIP == `0x42424242`.  
-- Screenshot: `artifact04_eip_42424242.png`
+![image alt](https://github.com/Ricjan5012/Buffer-Overflows-Made-Easy/blob/6b83e2cb582fd0917bdb3d867fe45d4ca43d96a9/step5.png)
 
 ## Step 6 — Finding Bad Characters (Part 6)
 - Append badchars sequence (all bytes except `\x00`) after return address.  
 - In Immunity hex dump, compare the in-memory sequence to expected.  
 - Identify any bytes that are altered (bad characters).  
-- Screenshot: `artifact05_badchars_hexdump.png`  
-- Record: `TODO_badchars`
+![image alt](https://github.com/Ricjan5012/Buffer-Overflows-Made-Easy/blob/6b83e2cb582fd0917bdb3d867fe45d4ca43d96a9/step6.png) 
 
 ## Step 7 — Finding the Right Module (Part 7)
 - Use `mona` to find modules without ASLR/DEP and search for `jmp esp`/useful gadgets.  
 - Choose module and address; set breakpoint (e.g., `essfunc`) and test.  
-- Screenshot: `artifact06_essfunc_breakpoint.png`  
-- Record: `TODO_module_name @ TODO_address`
+![image alt](https://github.com/Ricjan5012/Buffer-Overflows-Made-Easy/blob/6b83e2cb582fd0917bdb3d867fe45d4ca43d96a9/step7.png) 
 
 ## Step 8 — Generating Shellcode & Gaining Shell (Part 8)
 - Generate shellcode excluding bad chars, example:
@@ -103,8 +100,7 @@ This lab follows **The Cyber Mentor** series (Parts 1–8) to exploit `vulnserve
 - Final payload: `<padding>` + `<JMP/RET address>` + `<NOP sled>` + `<shellcode>`  
 - On Kali: `nc -lvnp 4444`  
 - Trigger exploit and run `whoami`.  
-- Screenshot: `artifact07_nc_whoami.png`  
-- Record: `TODO_whoami_output`
+![image alt](https://github.com/Ricjan5012/Buffer-Overflows-Made-Easy/blob/6b83e2cb582fd0917bdb3d867fe45d4ca43d96a9/step8.png)
 
 # Reproduction Summary
 1. Start Win10 & Kali VMs (same network).  
