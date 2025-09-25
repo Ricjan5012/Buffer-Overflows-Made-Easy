@@ -105,3 +105,21 @@ This lab follows **The Cyber Mentor** series (Parts 1–8) to exploit `vulnserve
 - Trigger exploit and run `whoami`.  
 - Screenshot: `artifact07_nc_whoami.png`  
 - Record: `TODO_whoami_output`
+
+# Reproduction Summary
+1. Start Win10 & Kali VMs (same network).  
+2. Run vulnserver as Admin on Win10.  
+3. Fuzz `TRUN` to find crash.  
+4. Use cyclic pattern to find offset where EIP is overwritten.  
+5. Overwrite EIP with `0x42424242` to confirm control.  
+6. Identify bad chars and choose module/gadget.  
+7. Generate shellcode excluding bad chars.  
+8. Start `nc -lvnp 4444` on Kali and trigger final exploit to get shell.
+
+---
+
+# Troubleshooting & Tips
+- If Python 3 errors occur: try changing the first line of the script from “#!/usr/bin/python” to “#!/usr/bin/python2” or you can invoke your script using “python2” at the command line.
+- If Immunity behaves oddly: reboot VM or reinstall.  
+- If traffic blocked: disable AV/firewall temporarily.  
+- Use snapshots after each successful step.
